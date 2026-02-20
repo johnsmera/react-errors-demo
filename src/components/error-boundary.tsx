@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component, ErrorInfo, ReactNode, startTransition } from "react";
 
 interface Props {
   children?: ReactNode;
@@ -15,7 +15,7 @@ class ErrorBoundary extends Component<Props, State> {
     hasError: false,
   };
 
-  public static getDerivedStateFromError(_: Error): State {
+  public static getDerivedStateFromError(): State {
     return { hasError: true };
   }
 
@@ -24,8 +24,11 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleRetry = () => {
-    this.props.onRetry?.();
-    this.setState({ hasError: false });
+    startTransition(() => {
+      this.setState({ hasError: false });
+      
+      this.props.onRetry?.();
+    });
   };
 
   public render() {
